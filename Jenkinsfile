@@ -9,7 +9,8 @@ pipeline {
             steps {
                 script {
                     echo "hi"
-                     //checkout scmGit(branches: [[name: '*/feature']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github', url: 'https://github.com/ShekharRedd/task_management.git']])
+                    // uncomment and modify the checkout step if needed
+                    // checkout scmGit(branches: [[name: '*/feature']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github', url: 'https://github.com/ShekharRedd/task_management.git']])
                 }
             }
         }
@@ -23,10 +24,12 @@ pipeline {
                         def pipCommand = "${venvPath}/pip"
 
                         // Activate the virtual environment
-                        sh ". ${venvPath}/activate"
+                        withEnv(["PATH+VENV=${venvPath}"]) {
+                            sh ". ${venvPath}/activate"
 
-                        // Install required packages using pip in the virtual environment
-                        sh "${pipCommand} install -r requirements.txt"   
+                            // Install required packages using pip in the virtual environment
+                            sh "${pipCommand} install -r requirements.txt"
+                        }
                     }
                 }
             }
@@ -34,20 +37,17 @@ pipeline {
 
         stage('Run Unit Tests') {
             steps {
-            catchError(buildResult: 'FAILURE') {
-                
+                catchError(buildResult: 'FAILURE') {
                     script {
                         def venvPath = "${env.WORKSPACE}/venv/bin"
-                        def activateScript = "${venvPath}/activate"
                         def pythonCommand = "${venvPath}/python"
-
-                        // Activate the virtual environment
-                        sh ". ${activateScript}"
 
                         // Change to the workspace directory
                         dir(env.WORKSPACE) {
-                            // Run unit.py script
-                            sh "${pythonCommand} unit.py"
+                            // Activate the virtual environment and run unit.py script
+                            withEnv(["PATH+VENV=${venvPath}"]) {
+                                sh ". ${venvPath}/activate && ${pythonCommand} unit.py"
+                            }
                         }
                     }
                 }
@@ -59,23 +59,22 @@ pipeline {
                 catchError(buildResult: 'FAILURE') {
                     script {
                         def venvPath = "${env.WORKSPACE}/venv/bin"
-                        def activateScript = "${venvPath}/activate"
                         def pythonCommand = "${venvPath}/python"
-
-                        // Activate the virtual environment
-                        sh ". ${activateScript}"
 
                         // Change to the workspace directory
                         dir(env.WORKSPACE) {
-                            // Run integration.py script
-                            sh "${pythonCommand} integration.py"
+                            // Activate the virtual environment and run integration.py script
+                            withEnv(["PATH+VENV=${venvPath}"]) {
+                                sh ". ${venvPath}/activate && ${pythonCommand} integration.py"
+                            }
                         }
                     }
                 }
             }
         }
     }
-        post {
+
+    post {
         success {
             script {
                 // Capture console logs
@@ -90,8 +89,9 @@ pipeline {
                     Console Output:
                     ${logs}
                 """
+
                 // Send formatted logs via email
-                emailext subject: 'Jenkins Successfully execute , you can raise the pull request',
+                emailext subject: 'Jenkins Successfully execute, you can raise the pull request',
                           body: formattedLogs,
                           to: 'madeep9347@gmail.com'
             }
@@ -100,15 +100,19 @@ pipeline {
             script {
                 // Capture console logs
                 def logs = currentBuild.rawBuild.getLog(1000)
+
                 // Format the logs for better readability
                 def formattedLogs = """
                     Jenkins Build Log
+
                     Build Status: ${currentBuild.result ?: 'Unknown'}
+
                     Console Output:
                     ${logs}
                 """
+
                 // Send formatted logs via email
-                emailext subject: 'Jenkins job failed , Please check the logs and review the code once ',
+                emailext subject: 'Jenkins job failed, Please check the logs and review the code once',
                           body: formattedLogs,
                           to: 'madeep9347@gmail.com'
             }
