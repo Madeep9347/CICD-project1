@@ -8,6 +8,7 @@ pipeline {
         stage("checkout to feature branch") {
             steps {
                 script {
+                    echo "hi"
                      //checkout scmGit(branches: [[name: '*/feature']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github', url: 'https://github.com/ShekharRedd/task_management.git']])
                 }
             }
