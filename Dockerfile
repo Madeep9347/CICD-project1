@@ -6,7 +6,7 @@ WORKDIR /home/python/
 
 COPY ./requirements.txt .
 
-# Install dependencies
+# Install dependencies 
 RUN pip install -r requirements.txt
 
 # Copy the application files
