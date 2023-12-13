@@ -15,3 +15,4 @@ COPY ./static/ ./static/
 COPY ./app.py .
 
 CMD ["python", "app.py"]
+
