@@ -93,7 +93,7 @@ pipeline {
                 // Send formatted logs via email
                 emailext subject: 'Jenkins Successfully execute, you can raise the pull request',
                           body: formattedLogs,
-                          to: 'shekharreddy1010@gmail.com
+                          to: 'shekharreddy1010@gmail.com'
             }
         }
         failure {
