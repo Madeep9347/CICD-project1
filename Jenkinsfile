@@ -93,7 +93,7 @@ pipeline {
                 // Send formatted logs via email
                 emailext subject: 'Jenkins Successfully execute, you can raise the pull request',
                           body: formattedLogs,
-                          to: 'madeep9347@gmail.com'
+                          to: 'shekharreddy1010@gmail.com
             }
         }
         failure {
@@ -114,7 +114,7 @@ pipeline {
                 // Send formatted logs via email
                 emailext subject: 'Jenkins job failed, Please check the logs and review the code once',
                           body: formattedLogs,
-                          to: 'madeep9347@gmail.com'
+                          to: 'shekharreddy1010@gmail.com'
             }
         }
     }
